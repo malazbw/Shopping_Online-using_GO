@@ -1,0 +1,56 @@
+syntax = "proto3";
+package api;
+option go_package = ".;api";
+
+
+message UserMessageResponse {
+    int32 userid = 1;
+    string name = 2; 
+}
+
+message UserMessageRequest {
+    int32 userid = 1;
+}
+
+/*
+Create a user request.
+*/
+message CreateUserRequest {
+    string name = 1;
+}
+
+/*
+Create a user response.
+*/
+message CreatedUserResponse {
+    int32 userid = 1;
+}
+
+message CreateCustomerRequest {
+  string name = 1;
+}
+
+message CreateCustomerResponse {
+  string greeting = 1;
+}
+
+service HelloCounter {
+  rpc Inc(IncRequest) returns (SumResponse) {}
+}
+
+message IncRequest {
+  string name = 1;
+}
+
+message SumResponse {
+  int32 counter = 1;
+}
+
+message Event {
+	// unique id
+	string id = 1;
+	// unix timestamp
+	int64 timestamp = 2;
+	// message
+	string message = 3;
+}
