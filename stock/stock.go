@@ -9,6 +9,7 @@ import (
 
 type StockHandlerService struct {
 	prodcuts   map[string]int32
+	reservedProducts   map[string]int32
 	
 }
 
@@ -16,13 +17,14 @@ type StockHandlerService struct {
 func CreateNewStockHandleInstance() *StockHandlerService {
 	return &StockHandlerService{
 		prodcuts:  make(map[string]int32),
+		reservedProducts:  make(map[string]int32),
 	}
 }
 
 
-func (c *StockHandlerService) containsProdcut(name string, count int32) bool {
+func (s *StockHandlerService) containsProdcut(name string, count int32) bool {
 	
-	if val, ok := c.prodcuts[name]; ok {
+	if val, ok := s.prodcuts[name]; ok {
 		if val >= count{
 		return true
 		}
@@ -31,22 +33,22 @@ func (c *StockHandlerService) containsProdcut(name string, count int32) bool {
 }
 
 
-func (c *StockHandlerService) Supply(ctx context.Context, req *api.SupplyRequest, rsp *api.SupplyResponse) error {
+func (s *StockHandlerService) Supply(ctx context.Context, req *api.SupplyRequest, rsp *api.SupplyResponse) error {
 	
 	
 	for key, value := range req.Products {
-		c.prodcuts[key] = c.prodcuts[key] + value
+		s.prodcuts[key] = s.prodcuts[key] + value
 	}
 	rsp.State = "Hiho " 
 	logger.Infof("zesss")
 		
 	return nil
 }
-func (c *StockHandlerService) ShipOrder(ctx context.Context, req *api.ShipOrderRequest, rsp *api.ShipOrderResponse) error {
+func (s *StockHandlerService) ShipOrder(ctx context.Context, req *api.ShipOrderRequest, rsp *api.ShipOrderResponse) error {
 	
 	
 	for key, value := range req.Products {
-		c.prodcuts[key] = c.prodcuts[key] - value
+		s.prodcuts[key] = s.prodcuts[key] - value
 	}
 	rsp.State =  true 
 	logger.Infof("shipping from stock")
@@ -56,24 +58,23 @@ func (c *StockHandlerService) ShipOrder(ctx context.Context, req *api.ShipOrderR
 
 
 
-func (c *StockHandlerService) CheckOrder(ctx context.Context, req *api.OrderRequest, rsp *api.OrderCheckResponse) error {
-	logger.Infof("step2") 
-	var check = true
+
+func (s *StockHandlerService) ReserveOrder(ctx context.Context, req *api.ReserveOrderRequest, rsp *api.ReserveOrderResponse) error {
+	
+	var available = true
 	for key, value := range req.Products {
-		if (!c.containsProdcut(key, value)) {
-			check = false
-			break
+		s.reservedProducts[key] = s.reservedProducts[key] + value
+		if (s.reservedProducts[key] > s.prodcuts[key]){
+			available = false
 		}
 	}
-
-	if check{
+	if available{
 		rsp.State = "order is taken, you can pay now"
 		logger.Infof("All items are available")
 	}else {
 		rsp.State = "order is not taken "
 		logger.Infof("Not all items are available") 
 	}
-	
 		
 	return nil
 }

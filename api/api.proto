@@ -28,7 +28,7 @@ message ReserveOrderRequest{
 
 message ReserveOrderResponse{
  
-  map<string, int32> products = 1;
+string state = 1;
 }
 
 message SupplyRequest{
