@@ -4,18 +4,15 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"sync"
+	// "sync"
 	"time"
-
-	"github.com/micro/go-micro/v2/logger"
-	"gitlab.lrz.devss/semester/ob-20ws/blatt2/blatt2-grp03/api"
+	// "github.com/micro/go-micro/v2/logger"
+	"blatt2-grp03/api"
 )
 
-type users struct {
-	name string
-}
+
 type CustomerHandlerService struct {
-	user         map[int32]*users
+	customer         map[int32]string
 
 }
 
@@ -23,16 +20,16 @@ const (
 	maxuserid int32 = 987654321
 )
 
-func (u *CustomerHandlerService) appendANewUser(id int32, user *users) bool {
-	if id != 0 && user != nil {
+func (u *CustomerHandlerService) appendANewUser(id int32, user string) bool {
+	if id != 0 && user != "" {
 		(*u.getUserMap())[id] = user
 		return true
 	}
 	return false
 }
 // getUserMap will return a pointer to the current user map in order to work in that. //
-func (u *CustomerHandlerService) getUserMap() *map[int32]*users {
-	return &u.user
+func (u *CustomerHandlerService) getUserMap() *map[int32]string {
+	return &u.customer
 }
 func (u *CustomerHandlerService) containsID(id int32) bool {
 	_, inMap := (*u.getUserMap())[id]
@@ -49,13 +46,17 @@ func (u *CustomerHandlerService) getRandomUserID(length int32) int32 {
 	}
 }
 
-
-
-func (u *CustomerHandlerService) CreateUser(context context.Context, request *api.CreateUserRequest, response *api.CreatedUserResponse) error {
+func CreateNewCustomerHandleInstance() *CustomerHandlerService {
+	return &CustomerHandlerService{
+		customer:  make(map[int32]string),
+	
+	}
+}
+func (u *CustomerHandlerService) CreateCustomer(context context.Context, request *api.CreateCustomerRequest, response *api.CreateCustomerResponse) error {
 	if request.GetName() != "" {
 		uid := u.getRandomUserID(maxuserid)
-		if u.appendANewUser(uid, &users{name: request.GetName()}) {
-			response.UserId =uid
+		if u.appendANewUser(uid, request.GetName()) {
+			response.Userid =uid
 			return nil
 		}
 	}

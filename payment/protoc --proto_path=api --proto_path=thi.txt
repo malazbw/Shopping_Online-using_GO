@@ -1,0 +1,1 @@
+protoc --proto_path=api --proto_path=third_party --micro_out=plugins=grpce:api api.proto  --go_out=plugins=grpc:api api.proto
