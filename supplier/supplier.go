@@ -21,7 +21,7 @@ func New(stock api.StockService) *Supplier {
 
 func (s *Supplier) Supply(ctx context.Context, req *api.SupplyRequest, rsp *api.SupplyResponse) error {
 	
-
+logger.Infof("Supply")
 	SupplyResponse, err := s.stock.Supply(context.Background(), &api.SupplyRequest{
 		Products: req.Products,
 	})

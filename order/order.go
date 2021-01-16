@@ -3,7 +3,7 @@ package customer
 import (
 	"context"
 	"math/rand"
-	"fmt"
+
 	// "sync"
 	"time"
 	 "github.com/micro/go-micro/v2/logger"
@@ -13,8 +13,10 @@ import (
 
 type Order struct {
 	orders         map[int32]map[string]int32
-	ordersAvalability         map[int32]bool
+	availableOrders         map[int32]bool
+	paidOrders        map[int32]bool
 	stock api.StockService
+	shipment api.ShipmentService
 }
 
 const (
@@ -47,18 +49,20 @@ func (u *Order) getRandomOrderID(length int32) int32 {
 	}
 }
 
-func New(stock api.StockService) *Order {
+func New(stock api.StockService, shipment api.ShipmentService) *Order {
 	return &Order{
 		orders:  make(map[int32]map[string]int32),
-		ordersAvalability:  make(map[int32]bool),
+		availableOrders:  make(map[int32]bool),
+		paidOrders:  make(map[int32]bool),
 		stock:stock,
+		shipment:shipment,
 
 	
 	}
 }
 func (o *Order) Place(ctx context.Context, request *api.OrderRequest, response *api.OrderResponse) error {
 	logger.Infof("step1")
-	orderCheckResponse, err := o.stock.ReserveOrder(context.Background(), &api.ReserveOrderRequest{
+	reserveOrderResponse, err := o.stock.ReserveOrder(context.Background(), &api.ReserveOrderRequest{
 		Products: request.Products,
 	})
 	logger.Infof("step2")
@@ -66,12 +70,13 @@ func (o *Order) Place(ctx context.Context, request *api.OrderRequest, response *
 		logger.Error(err)
 	}else{
 		response.Orderid  = o.getRandomOrderID(maxOrderId)
-		if len(orderCheckResponse.Products) == 0 {
-			o.ordersAvalability[response.Orderid] = true
-			logger.Infof("order ",response.Orderid,"is not fully taken")
+		o.orders[response.Orderid] = request.Products
+		if (reserveOrderResponse.State) {
+			o.availableOrders[response.Orderid] = true
+			logger.Infof("order ",response.Orderid,"is  fully taken")
 		}else{
-			o.ordersAvalability[response.Orderid] = false
-			logger.Infof("order ",response.Orderid,"is fully taken")
+			o.availableOrders[response.Orderid] = false
+			logger.Infof("order ",response.Orderid,"is not fully taken")
 		}
 		
 		
@@ -79,3 +84,18 @@ func (o *Order) Place(ctx context.Context, request *api.OrderRequest, response *
 	return nil
 }
 
+
+func (o *Order) InformPayment(ctx context.Context, request *api.InformPaymentRequest, response *api.InformPaymentResponse) error {
+	logger.Infof("InformPayment",request.Orderid,":", o.availableOrders[request.Orderid])
+	o.paidOrders[request.Orderid] = true
+	if (o.availableOrders[request.Orderid]){
+		_, err := o.shipment.Ship(context.Background(), &api.ShipmentRequest{
+			Products: o.orders[request.Orderid],
+		})
+		if err != nil {
+			logger.Error(err)
+	}
+	
+	}
+	return nil
+}

@@ -1,7 +1,7 @@
 package main
 
 import (
-	// "time"
+	"time"
 
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
@@ -26,6 +26,20 @@ func main() {
 		micro.Flags(&cli.IntFlag{
 			Name:  "sleep",
 			Usage: "sleep some seconds before the startup",
+		}),
+		
+	)
+
+	
+	service.Init(
+		micro.Action(func(c *cli.Context) error {
+			sleep := c.Int("sleep")
+			if sleep > 0 {
+				logger.Infof("sleeping %d seconds before startup", sleep)
+				time.Sleep(time.Duration(sleep) * time.Second)
+			}
+
+			return nil
 		}),
 	)
 

@@ -28,7 +28,7 @@ message ReserveOrderRequest{
 
 message ReserveOrderResponse{
  
-string state = 1;
+bool state = 1;
 }
 
 message SupplyRequest{
@@ -56,6 +56,8 @@ service Supplier {
 
 service Order {
   rpc Place(OrderRequest) returns (OrderResponse) {}
+  rpc InformPayment(InformPaymentRequest) returns (InformPaymentResponse) {}
+  
 }
 
 
@@ -68,10 +70,18 @@ message OrderResponse{
  
   int32 orderid = 1;
 }
+message InformPaymentRequest{
+ 
+  int32 orderid = 1;
+}
+message InformPaymentResponse{
+ 
+  int32 orderid = 1;
+}
 
 
 service Payment {
-  rpc Supply(PaymentRequest) returns (PaymentResponse) {}
+  rpc Pay(PaymentRequest) returns (PaymentResponse) {}
   
 }
 message PaymentRequest{

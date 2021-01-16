@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-
+	// "time"
 	// "github.com/micro/go-micro/v2/logger"
 	"blatt2-grp03/api"
 	"github.com/micro/go-micro/v2"
@@ -11,7 +11,7 @@ import (
 	"github.com/micro/go-plugins/store/redis/v2"
 )
 func main() {
-	fmt.Println("Start Test Skript")
+	fmt.Println("Start Script")
 	
 	registry := etcdv3.NewRegistry()
 	store := redis.NewStore()
@@ -22,17 +22,27 @@ func main() {
 	)
 	clientService.Init()
 
+	supplier:=api.NewSupplierService("supplier", clientService.Client())
+	var m map[string]int32
+	m = make(map[string]int32)
+	m["route"] = 66
+	
+	fmt.Println("Calling supply with product route %v", m["route"])
+	rsp, err := supplier.Supply(context.TODO(), &api.SupplyRequest{Products: m})
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("Received from supply %+v", rsp.State)
+		}
+	// time.Sleep(5 * time.Second)
 
-
-		var m2 map[string]int32
-	m2 = make(map[string]int32)
-	m2["route"] = 66
-		order:=api.NewOrderService("order", clientService.Client())
-		rsp2, err := order.Place(context.TODO(), &api.OrderRequest{Products: m2})
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				fmt.Println("Received: %+v", rsp2.Invoiceid)
-			}
+		
+	fmt.Println("Calling supply with product route %v", m["route"])
+		rsp4, err4 := supplier.Supply(context.TODO(), &api.SupplyRequest{Products: m})
+		if err4 != nil {
+			fmt.Println(err4)
+		} else {
+			fmt.Println("Received from supply: %+v", rsp4.State)
+		}	
 
 }

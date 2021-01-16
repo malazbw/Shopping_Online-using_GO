@@ -2,7 +2,7 @@ package stock
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/micro/go-micro/v2/logger"
 	"blatt2-grp03/api"
 )
@@ -35,12 +35,12 @@ func (s *StockHandlerService) containsProdcut(name string, count int32) bool {
 
 func (s *StockHandlerService) Supply(ctx context.Context, req *api.SupplyRequest, rsp *api.SupplyResponse) error {
 	
-	
+	fmt.Println("products before in Stock ", s.prodcuts)
 	for key, value := range req.Products {
 		s.prodcuts[key] = s.prodcuts[key] + value
 	}
 	rsp.State = "Hiho " 
-	logger.Infof("zesss")
+	fmt.Println("products in Stock ", s.prodcuts)
 		
 	return nil
 }
@@ -52,6 +52,7 @@ func (s *StockHandlerService) ShipOrder(ctx context.Context, req *api.ShipOrderR
 	}
 	rsp.State =  true 
 	logger.Infof("shipping from stock")
+	fmt.Println(req.Products)
 		
 	return nil
 }
@@ -62,18 +63,24 @@ func (s *StockHandlerService) ShipOrder(ctx context.Context, req *api.ShipOrderR
 func (s *StockHandlerService) ReserveOrder(ctx context.Context, req *api.ReserveOrderRequest, rsp *api.ReserveOrderResponse) error {
 	
 	var available = true
+	fmt.Println("products in stock ", s.prodcuts)
+	fmt.Println("products in req ", req.Products)
 	for key, value := range req.Products {
 		s.reservedProducts[key] = s.reservedProducts[key] + value
 		if (s.reservedProducts[key] > s.prodcuts[key]){
+			
 			available = false
 		}
+		logger.Infof("All reservedProducts are available", s.reservedProducts[key] )
+		logger.Infof("All prodcuts are available", s.prodcuts[key] )
 	}
+	rsp.State = available
 	if available{
-		rsp.State = "order is taken, you can pay now"
-		logger.Infof("All items are available")
+		logger.Infof("All items are available", )
+
 	}else {
-		rsp.State = "order is not taken "
-		logger.Infof("Not all items are available") 
+		
+		logger.Infof(" all items Not are available") 
 	}
 		
 	return nil

@@ -254,6 +254,7 @@ func NewOrderEndpoints() []*api.Endpoint {
 
 type OrderService interface {
 	Place(ctx context.Context, in *OrderRequest, opts ...client.CallOption) (*OrderResponse, error)
+	InformPayment(ctx context.Context, in *InformPaymentRequest, opts ...client.CallOption) (*InformPaymentResponse, error)
 }
 
 type orderService struct {
@@ -278,15 +279,27 @@ func (c *orderService) Place(ctx context.Context, in *OrderRequest, opts ...clie
 	return out, nil
 }
 
+func (c *orderService) InformPayment(ctx context.Context, in *InformPaymentRequest, opts ...client.CallOption) (*InformPaymentResponse, error) {
+	req := c.c.NewRequest(c.name, "Order.InformPayment", in)
+	out := new(InformPaymentResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Order service
 
 type OrderHandler interface {
 	Place(context.Context, *OrderRequest, *OrderResponse) error
+	InformPayment(context.Context, *InformPaymentRequest, *InformPaymentResponse) error
 }
 
 func RegisterOrderHandler(s server.Server, hdlr OrderHandler, opts ...server.HandlerOption) error {
 	type order interface {
 		Place(ctx context.Context, in *OrderRequest, out *OrderResponse) error
+		InformPayment(ctx context.Context, in *InformPaymentRequest, out *InformPaymentResponse) error
 	}
 	type Order struct {
 		order
@@ -303,6 +316,10 @@ func (h *orderHandler) Place(ctx context.Context, in *OrderRequest, out *OrderRe
 	return h.OrderHandler.Place(ctx, in, out)
 }
 
+func (h *orderHandler) InformPayment(ctx context.Context, in *InformPaymentRequest, out *InformPaymentResponse) error {
+	return h.OrderHandler.InformPayment(ctx, in, out)
+}
+
 // Api Endpoints for Payment service
 
 func NewPaymentEndpoints() []*api.Endpoint {
@@ -312,7 +329,7 @@ func NewPaymentEndpoints() []*api.Endpoint {
 // Client API for Payment service
 
 type PaymentService interface {
-	Supply(ctx context.Context, in *PaymentRequest, opts ...client.CallOption) (*PaymentResponse, error)
+	Pay(ctx context.Context, in *PaymentRequest, opts ...client.CallOption) (*PaymentResponse, error)
 }
 
 type paymentService struct {
@@ -327,8 +344,8 @@ func NewPaymentService(name string, c client.Client) PaymentService {
 	}
 }
 
-func (c *paymentService) Supply(ctx context.Context, in *PaymentRequest, opts ...client.CallOption) (*PaymentResponse, error) {
-	req := c.c.NewRequest(c.name, "Payment.Supply", in)
+func (c *paymentService) Pay(ctx context.Context, in *PaymentRequest, opts ...client.CallOption) (*PaymentResponse, error) {
+	req := c.c.NewRequest(c.name, "Payment.Pay", in)
 	out := new(PaymentResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -340,12 +357,12 @@ func (c *paymentService) Supply(ctx context.Context, in *PaymentRequest, opts ..
 // Server API for Payment service
 
 type PaymentHandler interface {
-	Supply(context.Context, *PaymentRequest, *PaymentResponse) error
+	Pay(context.Context, *PaymentRequest, *PaymentResponse) error
 }
 
 func RegisterPaymentHandler(s server.Server, hdlr PaymentHandler, opts ...server.HandlerOption) error {
 	type payment interface {
-		Supply(ctx context.Context, in *PaymentRequest, out *PaymentResponse) error
+		Pay(ctx context.Context, in *PaymentRequest, out *PaymentResponse) error
 	}
 	type Payment struct {
 		payment
@@ -358,8 +375,8 @@ type paymentHandler struct {
 	PaymentHandler
 }
 
-func (h *paymentHandler) Supply(ctx context.Context, in *PaymentRequest, out *PaymentResponse) error {
-	return h.PaymentHandler.Supply(ctx, in, out)
+func (h *paymentHandler) Pay(ctx context.Context, in *PaymentRequest, out *PaymentResponse) error {
+	return h.PaymentHandler.Pay(ctx, in, out)
 }
 
 // Api Endpoints for Shipment service

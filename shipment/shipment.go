@@ -2,8 +2,9 @@ package shipment
 
 import (
 	"context"
-	// "sync"
-	 "github.com/micro/go-micro/v2/logger"
+
+	"fmt"
+	"github.com/micro/go-micro/v2/logger"
 	"blatt2-grp03/api"
 )
 
@@ -28,7 +29,7 @@ func (o *Shipment) Ship(ctx context.Context, request *api.ShipmentRequest, respo
 		logger.Error(err)
 	}else{
 		
-			logger.Infof("Lieferung von", request.Products)
+		fmt.Println("products in shipment ", request.Products)
 	}
 	return nil
 }
