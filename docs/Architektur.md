@@ -8,6 +8,7 @@ graph TD;
   Supplier-->Stock;
   Payment-->Order;
   Order-->Shipment;
+  Order-->Stock;
   Shipment-->Stock;
 ```
 
