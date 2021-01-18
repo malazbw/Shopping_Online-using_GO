@@ -44,7 +44,7 @@ func (o *OrderService) isOrderAvailabe(id int32) bool {
 
 func (o *OrderService) updateFaildOrders(items map[string]int32) error {
 	for item, count := range items {
-		
+
 		var rest = count
 		for id, _ := range o.faildItemsOrders {
 			if rest == 0 {
