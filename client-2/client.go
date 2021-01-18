@@ -24,7 +24,7 @@ func New(supplier api.SupplierService, order api.OrderService, payment api.Payme
 }
 
 func (c *Client) Interact() {
-	logger.Infof("Szenario 3: %+v")
+	logger.Info("Szenario 3: %+v ")
 	var products map[string]int32
 	products = make(map[string]int32)
 	products["laptop"] = 1
@@ -32,7 +32,7 @@ func (c *Client) Interact() {
 	if err != nil {
 		logger.Error(err)
 	} else {
-		logger.Infof("Received: %+v", rsp.State)
+		logger.Info("Received: %+v ", rsp.State)
 	}
 
 	var order map[string]int32
@@ -45,7 +45,7 @@ func (c *Client) Interact() {
 	if err2 != nil {
 		logger.Error(err2)
 	} else {
-		logger.Infof("OrderId: %+v", orderRsp.Orderid)
+		logger.Info("OrderId: %+v ", orderRsp.Orderid)
 	}
 
 	//payment:=api.NewPaymentService("payment", clientService.Client())
@@ -53,7 +53,7 @@ func (c *Client) Interact() {
 	if err3 != nil {
 		logger.Error(err3)
 	} else {
-		logger.Infof("OrderId: %+v", paymentRsp.Result)
+		logger.Info(paymentRsp.Result)
 
 	}
 	var products2 map[string]int32
@@ -64,7 +64,7 @@ func (c *Client) Interact() {
 	if err4 != nil {
 		logger.Error(err4)
 	} else {
-		logger.Infof("Received: %+v", rsp4.State)
+		logger.Info("Received: %+v ", rsp4.State)
 	}
 
 }

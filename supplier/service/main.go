@@ -1,8 +1,7 @@
 package main
 
 import (
-	"time"
-	"log"
+	"blatt2-grp03/misc"
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/logger"
@@ -16,7 +15,7 @@ Main Function to start a new users service.
 */
 func main() {
 
-	
+	logger.DefaultLogger = misc.Logger()
 	registry := etcdv3.NewRegistry()
 	service := micro.NewService(
 		micro.Name("supplier"),
@@ -30,17 +29,7 @@ func main() {
 	)
 
 	
-	service.Init(
-		micro.Action(func(c *cli.Context) error {
-			sleep := c.Int("sleep")
-			if sleep > 0 {
-				logger.Infof("sleeping %d seconds before startup", sleep)
-				time.Sleep(time.Duration(sleep) * time.Second)
-			}
-
-			return nil
-		}),
-	)
+	service.Init()
 
 
 	
@@ -51,7 +40,7 @@ func main() {
 	}
 
 	if err := service.Run(); err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 }

@@ -34,16 +34,16 @@ func (s *StockHandlerService) containsProdcut(name string, count int32) bool {
 
 func (s *StockHandlerService) Supply(ctx context.Context, req *api.SupplyRequest, rsp *api.SupplyResponse) error {
 
-	logger.Infof("Before : products  in Stock ", s.prodcuts)
+	logger.Info("Before: Products in Stock", s.prodcuts)
 	for key, value := range req.Products {
 		s.prodcuts[key] = s.prodcuts[key] + value
 	}
-	rsp.State = "ok"
-	logger.Infof("After : products in Stock ", s.prodcuts)
+	rsp.State = "The Products are in stock"
+	logger.Info("After: products in Stock: ", s.prodcuts)
 
 	if err := s.publisher.Publish(context.Background(), &api.Event{
 		Products: req.Products,
-		Message: "new prodcuts has arrived",
+		Message: "New prodcuts in stock",
 	}); err != nil {
 		logger.Errorf("error while publishing: %+v", err)
 	}
@@ -57,8 +57,8 @@ func (s *StockHandlerService) ShipOrder(ctx context.Context, req *api.ShipOrderR
 		s.reservedProducts[key] = s.reservedProducts[key] - value
 	}
 	rsp.State = true
-	logger.Infof("shipping", req.Products, " from stock")
-	logger.Infof("prodcuts in stock", s.prodcuts)
+	logger.Info("Shipping ", req.Products, " from stock")
+	logger.Info("Prodcuts in stock ", s.prodcuts)
 
 	return nil
 }
@@ -68,8 +68,7 @@ func (s *StockHandlerService) ReserveOrder(ctx context.Context, req *api.Reserve
 	var order map[string]int32
 	order = make(map[string]int32)
 	var available = true
-	logger.Infof("products in stock ", s.prodcuts)
-	logger.Infof("order's products", req.Products)
+	logger.Info("order's products", req.Products)
 	for key, value := range req.Products {
 		if s.reservedProducts[key] < s.prodcuts[key] {
 			order[key] = (s.reservedProducts[key] + value) - s.prodcuts[key]
@@ -86,11 +85,11 @@ func (s *StockHandlerService) ReserveOrder(ctx context.Context, req *api.Reserve
 
 	if available {
 
-		logger.Infof("All items are available")
+		logger.Info("All items are available")
 
 	} else {
 
-		logger.Infof("Not all items are available")
+		logger.Info("Not all items are available")
 	}
 	rsp.State = available
 	rsp.FaildItems = order

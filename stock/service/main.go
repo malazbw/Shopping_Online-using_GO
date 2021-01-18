@@ -8,7 +8,7 @@ import (
 	"github.com/micro/go-micro/v2/logger"
 	"github.com/micro/go-plugins/registry/etcdv3/v2"
 	st"blatt2-grp03/stock"
-	
+	"blatt2-grp03/misc"
 	"blatt2-grp03/api"
 )
 
@@ -17,6 +17,7 @@ Main Function to start a new users service.
 */
 func main() {
 
+	logger.DefaultLogger = misc.Logger()
 	broker := nats.NewBroker()
 	registry := etcdv3.NewRegistry()
 	service := micro.NewService(

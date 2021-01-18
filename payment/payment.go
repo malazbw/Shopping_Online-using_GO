@@ -6,6 +6,7 @@ import (
 	"blatt2-grp03/api"
 
 	"github.com/micro/go-micro/v2/logger"
+	
 )
 
 type Payment struct {
@@ -27,7 +28,7 @@ func New(order api.OrderService) *Payment {
 }
 
 func (p *Payment) Pay(ctx context.Context, request *api.PaymentRequest, response *api.PaymentResponse) error {
-	logger.Infof("Zahlung erhalten für Bestellnummer: ", request.Orderid)
+	logger.Info("Zahlung erhalten für Bestellnummer: ", request.Orderid)
 	response.Result = "Zahlung Erfolreich"
 	p.payments = append(p.payments, request.Orderid)
 
@@ -45,7 +46,7 @@ func (p *Payment) Pay(ctx context.Context, request *api.PaymentRequest, response
 func (p *Payment) Return(ctx context.Context, request *api.ReturnRequest, response *api.ReturnResponse) error {
 
 	p.payments = p.remove(p.payments, request.Orderid)
-	logger.Infof("Empfangen einer Retoure mit Ersatzlieferungswunsch.")
+	logger.Info("Empfangen einer Retoure mit Ersatzlieferungswunsch.")
 
 	return nil
 }

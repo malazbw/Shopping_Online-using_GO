@@ -1,4 +1,4 @@
-package customer
+package order
 
 import (
 	"context"
@@ -24,7 +24,7 @@ type OrderService struct {
 	sentOrders       map[int32]bool
 	stock            api.StockService
 	shipment         api.ShipmentService
-	payment 		 api.PaymentService
+	payment          api.PaymentService
 }
 
 const (
@@ -43,8 +43,8 @@ func (o *OrderService) isOrderAvailabe(id int32) bool {
 }
 
 func (o *OrderService) updateFaildOrders(items map[string]int32) error {
-
 	for item, count := range items {
+		
 		var rest = count
 		for id, _ := range o.faildItemsOrders {
 			if rest == 0 {
@@ -100,7 +100,7 @@ func New(stock api.StockService, shipment api.ShipmentService, payment api.Payme
 		sentOrders:       make(map[int32]bool),
 		stock:            stock,
 		shipment:         shipment,
-		payment:		  payment,
+		payment:          payment,
 	}
 }
 func (o *OrderService) Place(ctx context.Context, request *api.OrderRequest, response *api.OrderResponse) error {
@@ -125,13 +125,13 @@ func (o *OrderService) Place(ctx context.Context, request *api.OrderRequest, res
 			products[item] = 0
 		}
 		o.faildItemsOrders[OrderID] = products
-		logger.Infof("Order's items are reserved")
-		logger.Infof("Order id: ", OrderID)
+		logger.Info("Order's items are reserved")
+		logger.Info("Order id: ", OrderID)
 		if reserveOrderResponse.State {
 
-			logger.Infof("all items are availabe in stock")
+			logger.Info("All items are availabe in stock")
 		} else {
-			logger.Infof("not all items are availabe")
+			logger.Info("Not all items are availabe")
 			for key, value := range reserveOrderResponse.FaildItems {
 				o.faildItemsOrders[OrderID][key] = value
 
@@ -139,14 +139,6 @@ func (o *OrderService) Place(ctx context.Context, request *api.OrderRequest, res
 		}
 
 	}
-	return nil
-}
-
-func (o *OrderService) Process(ctx context.Context, event *api.Event) error {
-	logger.Infof("Received event msg: %+v", event.GetMessage())
-
-	o.updateFaildOrders(event.Products)
-
 	return nil
 }
 
@@ -165,7 +157,7 @@ func (o *OrderService) ShipIfPossible() error {
 }
 
 func (o *OrderService) InformPayment(ctx context.Context, request *api.InformPaymentRequest, response *api.InformPaymentResponse) error {
-	logger.Infof("InformPayment", request.Orderid, ":", o.orders[request.Orderid])
+	logger.Info("InformPayment", request.Orderid, ":", o.orders[request.Orderid])
 	o.paidOrders[request.Orderid] = true
 	if o.isOrderAvailabe(request.Orderid) {
 		_, err := o.shipment.Ship(context.Background(), &api.ShipmentRequest{
@@ -173,7 +165,7 @@ func (o *OrderService) InformPayment(ctx context.Context, request *api.InformPay
 		})
 		if err != nil {
 			logger.Error(err)
-		}else {
+		} else {
 			o.sentOrders[request.Orderid] = true
 		}
 
@@ -185,32 +177,33 @@ func (o *OrderService) Cancel(ctx context.Context, request *api.CancelRequest, r
 	var orderID = request.Orderid
 	if _, ok := o.orders[orderID]; ok {
 		if !o.sentOrders[orderID] {
-			logger.Infof("Empfangen einer Retour mit Ersatzlieferungswunsch für orderID", orderID)
-			delete(o.sentOrders, orderID); 
-			delete(o.orders, orderID);
-			if (o.paidOrders[orderID]){
-			_, err := o.payment.Return(context.Background(), &api.ReturnRequest{
-				Orderid: orderID,
-			})
-			if err != nil{
-				logger.Error(err)
-			}else{
-				logger.Infof("payment", orderID, "is returned")
-				response.Message = "order is cancelled payment is returned"
-				delete(o.paidOrders, orderID)
-			}}else {
-				logger.Infof("order", orderID, "is cancelled")
+			logger.Info("Empfangen einer Retour mit Ersatzlieferungswunsch für orderID", orderID)
+			delete(o.sentOrders, orderID)
+			delete(o.orders, orderID)
+			if o.paidOrders[orderID] {
+				_, err := o.payment.Return(context.Background(), &api.ReturnRequest{
+					Orderid: orderID,
+				})
+				if err != nil {
+					logger.Error(err)
+				} else {
+					logger.Info("payment", orderID, "is returned")
+					response.Message = "order is cancelled payment is returned"
+					delete(o.paidOrders, orderID)
+				}
+			} else {
+				logger.Info("order", orderID, "is cancelled")
 				response.Message = "order is cancelled"
 			}
 
 		} else {
-			logger.Infof("order", orderID, "is already shipped")
+			logger.Info("order", orderID, "is already shipped")
 			response.Message = "order is already shipped "
 		}
 	} else {
-		logger.Infof("order not found")
-		response.Message ="order not found"
+		logger.Info("order not found")
+		response.Message = "order not found"
 	}
 	return nil
-	
+
 }
