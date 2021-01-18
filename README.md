@@ -1,8 +1,12 @@
 # Online-Shop
 
-In dieser Datei beschreiben Sie, wie die Szenarien gestartet werden können.
-Fügen Sie für jedes Szenario eine Kommandozeile ein, die ich komplett kopieren
-und in ein Terminal einfügen kann, um es zu starten.
 
-Beschreiben Sie hier außerdem wer was gemacht hat bzw. wer für welchen
-Teil verantwortlich ist.
+Die Planung:
+ Stock bestitz Prodcts(name, count)
+ Order besitz :
+    Orders(id, map(products())
+    OrderState ()
+
+• Welcher Service ist Besitzer welcher Daten?
+• Welcher Service muss welchen anderen Service kennen?
+• Wie kommuniziert welcher Service mit welchem anderen (synchron, asynchron)?
