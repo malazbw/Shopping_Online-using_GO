@@ -42,7 +42,7 @@ Payment->>Order:Inform Payment
         Shipment --> Stock: get order
         Order --> Client: Order is paid, and will be shiped
     else
-        Order ->> Payment:n is ready
+        Order ->> Payment:No old orders are ready
         Order --> Client :Order is paid, and will be shiped whe
     end
 
@@ -54,5 +54,6 @@ Stock->>Order:New Prodcts in Stock
 Stock->>Catalog:New Prodcts in stock
 
     
+
 
 ```
