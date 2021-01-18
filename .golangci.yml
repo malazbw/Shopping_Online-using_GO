@@ -1,4 +1,7 @@
 linters:
     presets:
-        - bugs
-        - style
+      - bugs
+      - style
+    disable:
+      - exhaustivestruct
+
