@@ -12,6 +12,11 @@ graph TD;
   Shipment-->Stock;
 ```
 
+
+
+
+
+
 ```mermaid
 sequenceDiagram
   Client->>Customer: create
