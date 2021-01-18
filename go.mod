@@ -7,6 +7,7 @@ require (
 	github.com/golang/protobuf v1.4.0
 	github.com/micro/cli/v2 v2.1.2
 	github.com/micro/go-micro/v2 v2.9.1
+	github.com/micro/go-plugins/broker/nats/v2 v2.9.1
 	github.com/micro/go-plugins/logger/zerolog/v2 v2.9.1
 	github.com/micro/go-plugins/registry/etcdv3/v2 v2.9.1
 	github.com/micro/go-plugins/store/redis/v2 v2.9.1

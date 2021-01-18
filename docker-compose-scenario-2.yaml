@@ -6,6 +6,8 @@ services:
             - ALLOW_NONE_AUTHENTICATION=yes
             - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
             - ETCDCTL_API=2
+    nats:
+        image: nats
     order-service:
         build:
             context: .
@@ -13,11 +15,12 @@ services:
         image: docker.pkg.github.com/vesose/example-micro/order:latest
         environment:
             - ALLOW_NONE_AUTHENTICATION=yes
-        command: --registry_address=etcd:2379
+        command: --registry_address=etcd:2379 --broker_address=nats:4222
         depends_on:
             - etcd
             - shipment-service
             - stock-service
+            - nats
     shipment-service:
         build:
             context: .
@@ -36,9 +39,10 @@ services:
         image: docker.pkg.github.com/vesose/example-micro/stock:latest
         environment:
             - ALLOW_NONE_AUTHENTICATION=yes
-        command: --registry_address=etcd:2379
+        command: --registry_address=etcd:2379 --broker_address=nats:4222
         depends_on:
             - etcd
+            - nats
     payment-service:
         build:
             context: .
@@ -64,14 +68,14 @@ services:
     client-service:
         build:
             context: .
-            dockerfile: client/service/Dockerfile
-        image: docker.pkg.github.com/vesose/example-micro/client:latest
+            dockerfile: client-2/service/Dockerfile
+        image: docker.pkg.github.com/vesose/example-micro/client-2:latest
         environment:
             - ALLOW_NONE_AUTHENTICATION=yes
         command: --registry_address=etcd:2379
         depends_on:
             - etcd
-            - stock-service
+            - supplier-service
             - order-service
             - payment-service
     

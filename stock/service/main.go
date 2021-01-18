@@ -1,10 +1,10 @@
 package main
 
 import (
-	"time"
 
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
+	nats "github.com/micro/go-plugins/broker/nats/v2"
 	"github.com/micro/go-micro/v2/logger"
 	"github.com/micro/go-plugins/registry/etcdv3/v2"
 	st"blatt2-grp03/stock"
@@ -17,12 +17,13 @@ Main Function to start a new users service.
 */
 func main() {
 
-	
+	broker := nats.NewBroker()
 	registry := etcdv3.NewRegistry()
 	service := micro.NewService(
 		micro.Name("stock"),
 		micro.Version("latest"),
 		micro.Registry(registry),
+		micro.Broker(broker),
 		micro.Flags(&cli.IntFlag{
 			Name:  "sleep",
 			Usage: "sleep some seconds before the startup",
@@ -31,21 +32,12 @@ func main() {
 	)
 
 	
-	service.Init(
-		micro.Action(func(c *cli.Context) error {
-			sleep := c.Int("sleep")
-			if sleep > 0 {
-				logger.Infof("sleeping %d seconds before startup", sleep)
-				time.Sleep(time.Duration(sleep) * time.Second)
-			}
-
-			return nil
-		}),
-	)
+	service.Init()
 
 	
 
-	if err :=  api.RegisterStockHandler(service.Server(), st.CreateNewStockHandleInstance()); err != nil {
+	if err :=  api.RegisterStockHandler(service.Server(),
+	 	st.CreateNewStockHandleInstance(micro.NewEvent("log.stock", service.Client()))); err != nil {
 		logger.Fatal(err)
 	}
 

@@ -3,12 +3,13 @@ package main
 import (
 	"time"
 
+	payment "blatt2-grp03/payment"
+
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/logger"
 	"github.com/micro/go-plugins/registry/etcdv3/v2"
-	payment"blatt2-grp03/payment"
-	
+
 	"blatt2-grp03/api"
 )
 
@@ -20,7 +21,7 @@ func main() {
 	logger.Infof("BEFORE REGISTERY")
 
 	registry := etcdv3.NewRegistry()
-	service := micro.NewService(	
+	service := micro.NewService(
 		micro.Name("payment"),
 		micro.Version("latest"),
 		micro.Registry(registry),
@@ -28,10 +29,8 @@ func main() {
 			Name:  "sleep",
 			Usage: "sleep some seconds before the startup",
 		}),
-		
 	)
 
-	
 	service.Init(
 		micro.Action(func(c *cli.Context) error {
 			sleep := c.Int("sleep")
@@ -46,14 +45,12 @@ func main() {
 
 	logger.Infof("AFTER REGISTERY")
 
-
-
 	if err := api.RegisterPaymentHandler(service.Server(),
-	payment.New(api.NewOrderService("order", service.Client()))); err != nil {
+		payment.New(api.NewOrderService("order", service.Client()))); err != nil {
 		logger.Infof("NEW ORDER")
 
-	logger.Fatal(err)
-}
+		logger.Fatal(err)
+	}
 
 	if err := service.Run(); err != nil {
 		logger.Infof("SERVICE RUN")

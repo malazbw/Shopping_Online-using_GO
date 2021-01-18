@@ -6,7 +6,7 @@ import (
 	"blatt2-grp03/misc"
 	"github.com/micro/go-plugins/registry/etcdv3/v2"
 	"github.com/micro/go-plugins/store/redis/v2"
-	"blatt2-grp03/client"
+	client"blatt2-grp03/client-3"
 	"blatt2-grp03/api"
 
 )

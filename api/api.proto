@@ -27,8 +27,8 @@ message ReserveOrderRequest{
 }
 
 message ReserveOrderResponse{
- 
-bool state = 1;
+  bool state = 1;
+  map<string, int32> faildItems= 2;
 }
 
 message SupplyRequest{
@@ -57,6 +57,7 @@ service Supplier {
 service Order {
   rpc Place(OrderRequest) returns (OrderResponse) {}
   rpc InformPayment(InformPaymentRequest) returns (InformPaymentResponse) {}
+  rpc Cancel(CancelRequest) returns (CancelResponse) {}
   
 }
 
@@ -82,6 +83,7 @@ message InformPaymentResponse{
 
 service Payment {
   rpc Pay(PaymentRequest) returns (PaymentResponse) {}
+  rpc Return(ReturnRequest) returns (ReturnResponse){}
   
 }
 message PaymentRequest{
@@ -103,4 +105,22 @@ map<string, int32> products = 1;
 
 message ShipmentResponse{
  map<string, int32> products = 1;
+}
+
+message Event {
+  map<string, int32> products = 1;
+  string message = 2;
+}
+
+message CancelRequest{
+  int32 orderid = 1;
+}
+message CancelResponse{
+  string message = 1;
+}
+message ReturnRequest{
+  int32 orderid = 1;
+}
+message ReturnResponse{
+  int32 orderid = 1;
 }
