@@ -3,10 +3,12 @@
 
 ```mermaid
 graph TD;
-  Client-->B;
-  A-->C;
-  B-->D;
-  C-->D;
+  Client-->Order;
+  Client-->Payment;
+  Supplier-->Stock;
+  Payment-->Order;
+  Order-->Shipment;
+  Shipment-->Stock;
 ```
 
 ```mermaid
