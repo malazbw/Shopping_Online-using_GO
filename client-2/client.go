@@ -24,7 +24,7 @@ func New(supplier api.SupplierService, order api.OrderService, payment api.Payme
 }
 
 func (c *Client) Interact() {
-	logger.Info("Szenario 3: %+v ")
+	logger.Info("Szenario 2:")
 	var products map[string]int32
 	products = make(map[string]int32)
 	products["laptop"] = 1

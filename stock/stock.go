@@ -68,7 +68,7 @@ func (s *StockHandlerService) ReserveOrder(ctx context.Context, req *api.Reserve
 	var order map[string]int32
 	order = make(map[string]int32)
 	var available = true
-	logger.Info("order's products", req.Products)
+	logger.Info("Order's products: ", req.Products)
 	for key, value := range req.Products {
 		if s.reservedProducts[key] < s.prodcuts[key] {
 			order[key] = (s.reservedProducts[key] + value) - s.prodcuts[key]

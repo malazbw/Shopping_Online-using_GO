@@ -15,11 +15,11 @@ type Client struct {
 }
 
 //consructor
-func New(supplier api.SupplierService, order api.OrderService, payment  api.PaymentService ) *Client {
+func New(supplier api.SupplierService, order api.OrderService, payment api.PaymentService) *Client {
 	return &Client{
 		supplier: supplier,
-		order: order,
-		payment: payment,
+		order:    order,
+		payment:  payment,
 	}
 }
 
@@ -55,13 +55,6 @@ func (c *Client) Interact() {
 	} else {
 		logger.Info("OrderId: %+v", paymentRsp.Result)
 
-	}
-
-	rsp4, err4 := c.supplier.Supply(context.TODO(), &api.SupplyRequest{Products: product})
-	if err4 != nil {
-		logger.Error(err4)
-	} else {
-		logger.Info("Received: %+v", rsp4.State)
 	}
 
 }

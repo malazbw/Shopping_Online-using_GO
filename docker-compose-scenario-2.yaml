@@ -20,7 +20,6 @@ services:
             - etcd
             - shipment-service
             - stock-service
-            - payment-service
             - nats
     shipment-service:
         build:

@@ -27,7 +27,7 @@ func (o *Shipment) Ship(ctx context.Context, request *api.ShipmentRequest, respo
 		logger.Error(err)
 	}else{
 		
-		logger.Info("Products are dispatched", request.Products)
+		logger.Info("Products are dispatched: ", request.Products)
 	}
 	return nil
 }
