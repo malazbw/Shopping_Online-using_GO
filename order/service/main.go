@@ -48,7 +48,7 @@ func main() {
 
 
 	if err := api.RegisterOrderHandler(service.Server(),
-	order.New(api.NewStockService("stock", service.Client()), api.NewShipmentService("shipment", service.Client()))); err != nil {
+	order.New(api.NewStockService("stock", service.Client()), api.NewShipmentService("shipment", service.Client()), api.NewPaymentService("payment", service.Client()))); err != nil {
 	logger.Fatal(err)
 }
 
