@@ -9,6 +9,7 @@ graph TD;
   Payment-->Order;
   Order-->Shipment;
   Shipment-->Stock;
+  Stock-->Order;
 ```
 
 ```mermaid
