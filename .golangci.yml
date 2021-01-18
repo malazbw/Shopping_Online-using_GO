@@ -1,5 +1,7 @@
 linters:
-
+    presets:
+      - bugs
+      - style
     disable:
       - exhaustivestruct
 
