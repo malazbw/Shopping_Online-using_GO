@@ -1,29 +1,74 @@
 # Architektur des Online-Shops
 
-Beschreiben Sie in dieser Datei die Architektur (Teilaufgabe 1) Ihres Webshops.
-Verwenden Sie zur Formatierung [GitLab Flavored Markdown (GFM)](https://docs.gitlab.com/ee/user/markdown.html), so dass
-sich die Datei auf GitLab schön lesen lässt.
-
-Sie können Grafiken z.B. per [Mermaid](https://mermaidjs.github.io/) einbinden:
 
 ```mermaid
 graph TD;
-  A-->B;
-  A-->C;
-  B-->D;
-  C-->D;
+  Client-->Order;
+  Client-->Payment;
+  Supplier-->Stock;
+  Payment-->Order;
+  Order-->Shipment;
+  Order-->Stock;
+  Shipment-->Stock;
 ```
+
+
+
+
+
 
 ```mermaid
 sequenceDiagram
-    Alice->>John: Hello John, how are you?
-    John-->>Alice: Great!
+  Client->>Customer: create
+    alt new customer
+        Customer-->Client: new customer created(Customer_id)
+    else old_customer
+        Customer-->Client: customer already existed
+    end
+ Client->>Catalog:show items
+ Catalog-->Client:Items   
+ Client->>Order: place
+ Order->>Customer: check
+    alt cusomter exist
+        Customer-->Order: customer exist
+         loop each item
+         Order->>Stock: reserve item
+         Stock --> Order: item resered
+        end
+        Order --> Client: order is taken, you can pay now to ship your order
+    else no customer
+        Customer->>Order: Customer doesn't exist
+        Order-->Client: Customer_id not found
+    end
+Client->>Payment:purshase order
+Payment->>Order:Inform Payment
+    alt order availabilty
+        Order ->> Shipment: ship order 
+        Shipment --> Stock: get order
+        Order --> Client: Order is paid, and will be shiped
+    else
+        Order ->> Payment:No old orders are ready
+        Order --> Client :Order is paid, and will be shiped whe
+    end
+
+Supplier->>Stock:supply new prodcuts
+Stock->>Order:New Prodcts in Stock
+    alt availabe orders
+        Order->>Shipment: Orders are able to be dispatched
+    END
+Stock->>Catalog:New Prodcts in stock
+
+    
+
+
 ```
 
-Zum Vorbereiten bietet sich der [Mermaid Live Editor](https://mermaid-js.github.io/mermaid-live-editor/) an.
+Die Planung:
+ Stock bestitz Prodcts(name, count)
+ Order besitz :
+    Orders(id, map(products())
+    OrderState ()
 
-Sie können aber auch Grafiken mit einem extra Programm erzeugen und
-als [Images einbinden](https://docs.gitlab.com/ee/user/markdown.html#images).
-
-Wenn Sie Ihre Dokumentation in mehrere Dateien aufteilen, verlinken Sie sie aus dieser
-Datei heraus so, dass ich auf der GitLab Site navigieren kann.
+• Welcher Service ist Besitzer welcher Daten?
+• Welcher Service muss welchen anderen Service kennen?
+• Wie kommuniziert welcher Service mit welchem anderen (synchron, asynchron)?
